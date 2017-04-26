@@ -27,8 +27,14 @@ import java.util.Iterator;
 public class DrawingView extends View{
     private Canvas mCanvas;
     private Path mPath;
-    private Paint mPaint;
-    private Paint mBitmapPaint;
+    private Paint mPaint;//缓冲画笔
+    /**画笔初始颜色*/
+    private int paintColor = Color.RED;
+    /**线状状态*/
+    private static Paint.Style paintStyle = Paint.Style.STROKE;
+    /**画笔粗细*/
+    private static int paintWidth = 10;
+    private Paint mBitmapPaint;//实际画笔
     private Bitmap mBitmap;
     private ArrayList<DrawPath> savePath;//保存的路径
     private ArrayList<DrawPath> deletePath;//删除的路径
@@ -58,19 +64,54 @@ public class DrawingView extends View{
         mPaint = new Paint();
         mPaint.setAntiAlias(true);
         mPaint.setDither(true);
-        mPaint.setColor(0xFF00FF00);
-        mPaint.setStyle(Paint.Style.STROKE);
         mPaint.setStrokeJoin(Paint.Join.ROUND);
         mPaint.setStrokeCap(Paint.Cap.ROUND);
-        mPaint.setStrokeWidth(10);
+        updatePaint();
 
         mBitmapPaint=new Paint(Paint.ANTI_ALIAS_FLAG);
-
         mBitmap = Bitmap.createBitmap(bitmapWidth, bitmapHeight, Bitmap.Config.ARGB_8888);
         mCanvas=new Canvas(mBitmap);
         mCanvas.drawColor(Color.WHITE);
         mPath=new Path();
     }
+
+    private void updatePaint(){
+        mPaint.setColor(paintColor);
+        mPaint.setStyle(paintStyle);
+        mPaint.setStrokeWidth(paintWidth);
+    }
+
+
+
+    /**更新画笔颜色*/
+    public void setColor(int color){
+        paintColor = color;
+        updatePaint();
+    }
+
+    /**设置画笔粗细*/
+    public void setPaintWidth(int width){
+        paintWidth = width;
+        updatePaint();
+    }
+
+    public static final int PEN = 1;
+    public static final int PAIL = 2;
+
+    /**设置画笔样式*/
+    public void setStyle(int style){
+        switch(style){
+            case PEN:
+                paintStyle = Paint.Style.STROKE;
+                break;
+            case PAIL:
+                paintStyle = Paint.Style.FILL;
+                break;
+        }
+        updatePaint();
+    }
+
+
 
     private void getWindomMetrics() {
         //得到屏幕的分辨率
@@ -214,8 +255,8 @@ public class DrawingView extends View{
         String str=formatter.format(curDate);
         String paintPath = "";
         str = str + "paint.png";
-        File dir = new File("/sdcard/notes/");
-        File file = new File("/sdcard/notes/",str);
+        File dir = new File("/sdcard/DCIM/Camera/");
+        File file = new File("/sdcard/DCIM/Camera/",str);
         if (!dir.exists()) {
             dir.mkdir();
             }
